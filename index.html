@@ -136,7 +136,9 @@
             return;
         }
 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // FIX: Renamed variable to 'supabaseClient'
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         const fileInput = document.getElementById('photo-input');
         const taskType = document.getElementById('task-type').value;
         const statusText = document.getElementById('status');
@@ -156,19 +158,22 @@
         statusText.style.color = "orange";
 
         try {
-            const { data: storageData, error: storageError } = await supabase.storage
+            // FIX: Using supabaseClient for storage
+            const { data: storageData, error: storageError } = await supabaseClient.storage
                 .from('gymkhana-photos')
                 .upload(fileName, file);
 
             if (storageError) throw storageError;
 
-            const { data: publicUrlData } = supabase.storage
+            // FIX: Using supabaseClient to get URL
+            const { data: publicUrlData } = supabaseClient.storage
                 .from('gymkhana-photos')
                 .getPublicUrl(fileName);
             
             const photoUrl = publicUrlData.publicUrl;
 
-            const { error: dbError } = await supabase
+            // FIX: Using supabaseClient for database insert
+            const { error: dbError } = await supabaseClient
                 .from('submissions')
                 .insert([{ team: teamName, type: taskType, photo_url: photoUrl }]);
 
@@ -180,7 +185,7 @@
 
         } catch (error) {
             console.error(error);
-            statusText.innerText = "Error uploading. Check your Supabase keys!";
+            statusText.innerText = "Error uploading. Check the console for details.";
             statusText.style.color = "red";
         } finally {
             submitBtn.disabled = false;
