@@ -1,0 +1,103 @@
+:root {
+    --primary-color: #333;
+    --bg-color: #f4f4f9;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    background-color: var(--primary-color);
+    color: white;
+    width: 100%;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* Navegació (Pestanyes) */
+.nav {
+    display: flex;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+.nav button {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 15px 10px;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    margin: 0;
+}
+
+.nav button.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: bold;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 400px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+/* Ocultar pestanyes no actives */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+h2 { margin-top: 0; color: var(--primary-color); }
+
+.schedule-card {
+    background: #fff3cd;
+    border-left: 5px solid #ffc107;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+select, input[type="file"], .btn {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.btn {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:disabled { background-color: #ccc; }
+
+.status { font-weight: bold; text-align: center; margin-top: 5px; }
+.quest-list { margin-bottom: 20px; font-size: 14px; }
+.quest-list li { margin-bottom: 8px; }
+.points { font-weight: bold; color: #d32f2f; }

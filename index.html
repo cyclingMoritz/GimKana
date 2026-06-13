@@ -1,197 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Birthday Gymkhana</title>
+    <title>Gimcana d'Aniversari</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --primary-color: #333;
-            --bg-color: #f4f4f9;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            margin-top: 20px;
-        }
-        h1 { margin-top: 0; color: var(--primary-color); }
-        .schedule-card {
-            background: #fff3cd;
-            border-left: 5px solid #ffc107;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        .upload-section { margin-top: 20px; }
-        select, input[type="file"], button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:disabled { background-color: #ccc; }
-        #status { font-weight: bold; text-align: center; margin-top: 10px; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h2 id="team-display">Loading Team...</h2>
+    <header id="team-display">Carregant equip...</header>
 
-    <div class="container">
+    <div class="nav">
+        <button class="tab-btn active" onclick="showTab('inici')">Inici</button>
+        <button class="tab-btn" onclick="showTab('ruta')">La Ruta</button>
+        <button class="tab-btn" onclick="showTab('reptes')">Reptes</button>
+        <button class="tab-btn" onclick="showTab('normes')">Normes</button>
+    </div>
+
+    <div id="tab-inici" class="tab-content active container">
+        <h2>Benvinguts a la Gimcana!</h2>
+        <p>Prepareu-vos per explorar Sant Feliu i fer una mica el ridícul.</p>
+        <p>Feu servir el menú de dalt per navegar:</p>
+        <ul>
+            <li><strong>La Ruta:</strong> On heu d'anar a cada moment (amb cronòmetre).</li>
+            <li><strong>Reptes:</strong> Punts extres per fotos boges.</li>
+        </ul>
+        <button class="btn" onclick="showTab('ruta')">Començar la Ruta</button>
+    </div>
+
+    <div id="tab-ruta" class="tab-content container">
+        <h2>Llocs on anar</h2>
+        
         <div class="schedule-card">
-            <h3 style="margin-top: 0;">Current Objective</h3>
-            <p id="current-time">Time: 00:00</p>
-            <p id="objective-text">Calculating next landmark...</p>
+            <h3 style="margin-top: 0;">Objectiu Actual</h3>
+            <p id="current-time" style="font-weight: bold; font-size: 1.2em;">Hora: 00:00</p>
+            <p id="objective-text">Calculant propera parada...</p>
         </div>
 
-        <div class="upload-section">
-            <h3>Submit Photo</h3>
-            <select id="task-type">
-                <option value="Landmark">Main Landmark</option>
-                <option value="Side Quest">Side Quest</option>
-            </select>
-            
-            <input type="file" id="photo-input" accept="image/*" capture="environment">
-            
-            <button id="submit-btn" onclick="uploadPhoto()">Upload & Submit</button>
-            <p id="status"></p>
+        <div style="border-top: 1px solid #eee; padding-top: 15px;">
+            <h3>Puja la foto del lloc!</h3>
+            <input type="file" id="ruta-photo" accept="image/*" capture="environment">
+            <button id="ruta-btn" class="btn" onclick="uploadPhoto('Ruta', 'ruta-photo', 'ruta-btn', 'ruta-status')">Enviar Foto del Lloc</button>
+            <p id="ruta-status" class="status"></p>
         </div>
     </div>
 
-    <script>
-    // 1. READ TEAM FROM URL & SET THEME (Moved to the top!)
-    const urlParams = new URLSearchParams(window.location.search);
-    const teamName = urlParams.get('team') || 'Unknown Team';
-    document.getElementById('team-display').innerText = `Team: ${teamName}`;
-
-    // Apply color to the h2 element dynamically
-    document.getElementById('team-display').style.color = 'var(--primary-color)';
-
-    if(teamName.toLowerCase() === 'red') { document.documentElement.style.setProperty('--primary-color', '#d32f2f'); }
-    if(teamName.toLowerCase() === 'blue') { document.documentElement.style.setProperty('--primary-color', '#1976d2'); }
-    if(teamName.toLowerCase() === 'green') { document.documentElement.style.setProperty('--primary-color', '#388e3c'); }
-
-    // 2. SCHEDULE LOGIC
-    const schedule = [
-        { start: "14:00", end: "15:30", landmark: "The Old Fountain", instructions: "Find the hidden symbol." },
-        { start: "15:30", end: "16:30", landmark: "Town Hall Square", instructions: "Group photo with a local." },
-        { start: "16:30", end: "18:00", landmark: "The Bridge", instructions: "Final checkpoint!" }
-    ];
-
-    function updateSchedule() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const currentTimeStr = `${hours}:${minutes}`;
+    <div id="tab-reptes" class="tab-content container">
+        <h2>Fotos a fer (Punts extres)</h2>
+        <p>Sempre que tingueu temps lliure, intenteu fer aquestes fotos per guanyar punts:</p>
         
-        document.getElementById('current-time').innerText = `Current Time: ${currentTimeStr}`;
+        <ul class="quest-list">
+            <li>Enterrar una persona <span class="points">(5p)</span></li>
+            <li>Foto amb gata <span class="points">(3p)</span></li>
+            <li>Portar 70ml d’aigua de mar <span class="points">(3p qui s’apropi més, 1p originalitat)</span></li>
+            <li>Far <span class="points">(2p)</span></li>
+            <li>Foto amb guiris <span class="points">(1p per nacionalitat diferent)</span></li>
+            <li>Foto amb flors de carrer <span class="points">(Tres diferents mínim, 1p)</span></li>
+            <li>Foto amb gos <span class="points">(-1p... o 2p la més original!)</span></li>
+            <li>Branca romaní <span class="points">(1p)</span></li>
+            <li>Llenya <span class="points">(1p qui en porti més)</span></li>
+            <li>Bunker <span class="points">(1p)</span></li>
+        </ul>
 
-        let currentObjective = "Free time! Check back later or do Side Quests.";
-        for (const slot of schedule) {
-            if (currentTimeStr >= slot.start && currentTimeStr < slot.end) {
-                currentObjective = `<strong>${slot.landmark}</strong><br>${slot.instructions}<br><em>(Ends at ${slot.end})</em>`;
-                break;
-            }
-        }
-        document.getElementById('objective-text').innerHTML = currentObjective;
-    }
+        <div style="border-top: 1px solid #eee; padding-top: 15px;">
+            <h3>Enviar Repte</h3>
+            <select id="repte-select">
+                <option value="Repte: Enterrar persona">Enterrar una persona</option>
+                <option value="Repte: Foto gata">Foto amb gata</option>
+                <option value="Repte: Aigua de mar">Portar 70ml d’aigua de mar</option>
+                <option value="Repte: Far">Far</option>
+                <option value="Repte: Foto guiris">Foto amb guiris</option>
+                <option value="Repte: Flors carrer">Foto amb flors de carrer</option>
+                <option value="Repte: Foto gos">Foto amb gos</option>
+                <option value="Repte: Branca romaní">Branca romaní</option>
+                <option value="Repte: Llenya">Llenya</option>
+                <option value="Repte: Bunker">Bunker</option>
+            </select>
+            <input type="file" id="repte-photo" accept="image/*" capture="environment">
+            <button id="repte-btn" class="btn" onclick="uploadPhoto('Repte', 'repte-photo', 'repte-btn', 'repte-status')">Enviar Foto del Repte</button>
+            <p id="repte-status" class="status"></p>
+        </div>
+    </div>
 
-    updateSchedule();
-    setInterval(updateSchedule, 30000);
-
-    // 3. SET UP SUPABASE
-
-        const SUPABASE_URL = 'https://ryhyimknhuhrhtxcqxwy.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5aHlpbWtuaHVocmh0eGNxeHd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNDM1MjIsImV4cCI6MjA5NjkxOTUyMn0.JArfyRBfbjJMVslhHjAhjiBLXbG6eQCfSVAFDtiMK1E';
-    
-    // We only create the client inside the upload function so it doesn't crash the page on load
-    async function uploadPhoto() {
-        if (teamName === 'Unknown Team') {
-            alert("No team detected! Make sure you are using your team's specific link.");
-            return;
-        }
-
-        // FIX: Renamed variable to 'supabaseClient'
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        const fileInput = document.getElementById('photo-input');
-        const taskType = document.getElementById('task-type').value;
-        const statusText = document.getElementById('status');
-        const submitBtn = document.getElementById('submit-btn');
-
-        if (!fileInput.files || fileInput.files.length === 0) {
-            alert("Please select a photo first!");
-            return;
-        }
-
-        const file = fileInput.files[0];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${teamName}_${taskType.replace(/\s+/g, '')}_${Date.now()}.${fileExt}`;
-
-        submitBtn.disabled = true;
-        statusText.innerText = "Uploading photo... Please wait.";
-        statusText.style.color = "orange";
-
-        try {
-            // FIX: Using supabaseClient for storage
-            const { data: storageData, error: storageError } = await supabaseClient.storage
-                .from('gymkhana-photos')
-                .upload(fileName, file);
-
-            if (storageError) throw storageError;
-
-            // FIX: Using supabaseClient to get URL
-            const { data: publicUrlData } = supabaseClient.storage
-                .from('gymkhana-photos')
-                .getPublicUrl(fileName);
-            
-            const photoUrl = publicUrlData.publicUrl;
-
-            // FIX: Using supabaseClient for database insert
-            const { error: dbError } = await supabaseClient
-                .from('submissions')
-                .insert([{ team: teamName, type: taskType, photo_url: photoUrl }]);
-
-            if (dbError) throw dbError;
-
-            statusText.innerText = "Success! Photo submitted.";
-            statusText.style.color = "green";
-            fileInput.value = ""; 
-
-        } catch (error) {
-            console.error(error);
-            statusText.innerText = "Error uploading. Check the console for details.";
-            statusText.style.color = "red";
-        } finally {
-            submitBtn.disabled = false;
-        }
-    }
-</script>
-  
-</body>
-</html>
+    <div id="tab-normes" class="tab-content container">
+        <h2>Normes</h2>
+        <ul>
