@@ -39,10 +39,10 @@ function showTab(tabId) {
 
 // --- 3. HORARI (SCHEDULE) ---
 const schedule = [
-    { start: "00:30", end: "00:45", landmark: "Ancla Platja Sant Feliu", instructions: "Lloc d'inici!" },
-    { start: "00:45", end: "01:00", landmark: "Font ajuntament de Sant Feliu", instructions: "No us mulleu gaire." },
-    { start: "01:00", end: "01:15", landmark: "Discoteca Abandonada", instructions: "Al Passeig de Rius i Calvet." },
-    { start: "01:15", end: "01:30", landmark: "Torre Museu San Felix", instructions: "És gratis! L'última parada." }
+    { start: "00:45", end: "01:00", landmark: "Ancla Platja Sant Feliu", instructions: "Lloc d'inici!" },
+    { start: "01:00", end: "01:15",  landmark: "Font ajuntament de Sant Feliu", instructions: "No us mulleu gaire." },
+    { start: "01:15", end: "01:30", landmark: "Discoteca Abandonada", instructions: "Al Passeig de Rius i Calvet." },
+    { start: "01:30", end: "01:45", landmark: "Torre Museu San Felix", instructions: "És gratis! L'última parada." }
 ];
 
 function updateSchedule() {
