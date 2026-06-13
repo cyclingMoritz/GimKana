@@ -7,17 +7,17 @@ let teamName = 'Equip Desconegut';
 
 // Assignem noms i colors (Tema) segons l'equip
 if (teamParam === 'diables') {
-    teamName = 'Diables (Correfoc)';
+    teamName = 'Diables';
     // Colors Foc / Correfoc
     document.documentElement.style.setProperty('--primary-color', '#d84315'); 
     document.documentElement.style.setProperty('--bg-color', '#fbe9e7'); 
 } else if (teamParam === 'aniversari') {
-    teamName = 'Aniversari (Pau)';
+    teamName = 'Aniversari';
     // Colors Festius / Aniversari
     document.documentElement.style.setProperty('--primary-color', '#8e24aa'); 
     document.documentElement.style.setProperty('--bg-color', '#f3e5f5'); 
 } else if (teamParam === 'metge') {
-    teamName = 'Metge (Medicina)';
+    teamName = 'Metge ';
     // Colors Clínics / Hospital
     document.documentElement.style.setProperty('--primary-color', '#00897b'); 
     document.documentElement.style.setProperty('--bg-color', '#e0f2f1'); 
