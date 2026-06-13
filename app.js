@@ -1,18 +1,29 @@
 // --- 1. CONFIGURACIÓ DE L'EQUIP (URL) ---
 const urlParams = new URLSearchParams(window.location.search);
-const teamName = urlParams.get('team') || 'Equip Desconegut';
-document.getElementById('team-display').innerText = `Equip: ${teamName}`;
+const rawTeam = urlParams.get('team') || '';
+const teamParam = rawTeam.toLowerCase();
 
-// Colors per equip
-if(teamName.toLowerCase() === 'vermell' || teamName.toLowerCase() === 'red') { 
-    document.documentElement.style.setProperty('--primary-color', '#d32f2f'); 
+let teamName = 'Equip Desconegut';
+
+// Assignem noms i colors (Tema) segons l'equip
+if (teamParam === 'diables') {
+    teamName = 'Diables (Correfoc)';
+    // Colors Foc / Correfoc
+    document.documentElement.style.setProperty('--primary-color', '#d84315'); 
+    document.documentElement.style.setProperty('--bg-color', '#fbe9e7'); 
+} else if (teamParam === 'aniversari') {
+    teamName = 'Aniversari (Pau)';
+    // Colors Festius / Aniversari
+    document.documentElement.style.setProperty('--primary-color', '#8e24aa'); 
+    document.documentElement.style.setProperty('--bg-color', '#f3e5f5'); 
+} else if (teamParam === 'metge') {
+    teamName = 'Metge (Medicina)';
+    // Colors Clínics / Hospital
+    document.documentElement.style.setProperty('--primary-color', '#00897b'); 
+    document.documentElement.style.setProperty('--bg-color', '#e0f2f1'); 
 }
-if(teamName.toLowerCase() === 'blau' || teamName.toLowerCase() === 'blue') { 
-    document.documentElement.style.setProperty('--primary-color', '#1976d2'); 
-}
-if(teamName.toLowerCase() === 'verd' || teamName.toLowerCase() === 'green') { 
-    document.documentElement.style.setProperty('--primary-color', '#388e3c'); 
-}
+
+document.getElementById('team-display').innerText = `Equip: ${teamName}`;
 
 // --- 2. LÒGICA DE LES PESTANYES (TABS) ---
 function showTab(tabId) {
